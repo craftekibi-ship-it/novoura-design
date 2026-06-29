@@ -1,0 +1,9 @@
+.git
+node_modules
+vendor
+.env
+.env.*
+storage/app/public/posts
+database/*.sqlite
+*.log
+.DS_Store
