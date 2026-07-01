@@ -102,6 +102,7 @@ class StudioController extends Controller
                 'phone' => '+90 536 929 70 69',
                 'website' => ['www.estorestaurant.com', 'ru.estorestaurant.com'],
                 'fonts' => ['script' => 'Caveat', 'body' => 'Poppins'],
+                'text_overlay' => true, // gerçek Instagram'da her postta tutarlı kullanılıyor
             ],
             'serm-barr' => [
                 'id' => 'serm-barr-post-01',
@@ -111,6 +112,7 @@ class StudioController extends Controller
                 'phone' => '+90 534 695 77 70',
                 'website' => ['www.sermbarr.com'],
                 'fonts' => ['script' => 'Poppins', 'body' => 'Poppins'], // sade, el yazısı yok
+                'text_overlay' => false, // gerçek ürün fotoları tamamen temiz, sadece filigran
             ],
             'vail' => [
                 'id' => 'vail-post-01',
@@ -120,24 +122,27 @@ class StudioController extends Controller
                 'phone' => '+90 534 695 77 70',
                 'website' => ['www.vailcaravan.com'],
                 'fonts' => ['script' => 'Poppins', 'body' => 'Poppins'],
+                'text_overlay' => false, // gerçek ürün fotoları temiz, mesaj caption'da
             ],
             'pureline' => [
                 'id' => 'pureline-post-01',
                 'frame' => 'pureline',
                 'canvas' => ['w' => 1080, 'h' => 1350],
-                'brand_color' => '#3BD6C0',           // ferah teal
+                'brand_color' => '#29ABE2',           // açık mavi vurgu (gerçek site paleti)
                 'phone' => '',
                 'website' => ['www.purelinecleaning.com'],
                 'fonts' => ['script' => 'Poppins', 'body' => 'Poppins'],
+                'text_overlay' => false, // sade/kurumsal temizlik markası, minimal görsel
             ],
             'dethleffs-leal' => [
                 'id' => 'dethleffs-post-01',
                 'frame' => 'dethleffs',
                 'canvas' => ['w' => 1080, 'h' => 1350],
-                'brand_color' => '#D9BE84',           // altın
+                'brand_color' => '#C0392B',           // gerçek marka rengi: kurumsal kırmızı
                 'phone' => '',
                 'website' => ['www.lealkaravan.com'],
                 'fonts' => ['script' => 'Poppins', 'body' => 'Poppins'],
+                'text_overlay' => false, // gerçek ürün fotoları temiz, sadece köşe logoları
             ],
             'novoura' => [
                 'id' => 'novoura-post-01',
@@ -147,6 +152,7 @@ class StudioController extends Controller
                 'phone' => '',
                 'website' => ['novouracreative.com'],
                 'fonts' => ['script' => 'Poppins', 'body' => 'Poppins'],
+                'text_overlay' => false, // aktif Instagram yok; sade/minimal site diliyle tutarlı
             ],
         ];
 

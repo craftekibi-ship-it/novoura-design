@@ -69,6 +69,11 @@
 
     <div class="divider"></div>
 
+    <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+      <input type="checkbox" id="fTextOverlay" style="width:auto"> Görsel üstünde yazı göster
+    </label>
+    <p class="mini">Kapalıysa fotoğraf temiz kalır, sadece marka filigranı görünür — metin yine de caption'a gider.</p>
+
     <label>Görsel başlığı (beyaz)</label>
     <input type="text" id="fHeadline" placeholder="Warm künefe,">
     <label>Vurgu (amber, el yazısı)</label>
@@ -126,6 +131,7 @@ const AMBER = T.brand_color;
 const FORMATS = { post:{w:1080,h:1350}, story:{w:1080,h:1920} };
 let currentFormat = 'post';
 let W = FORMATS.post.w, H = FORMATS.post.h;
+let textOverlayOn = T.text_overlay !== false;
 
 function fitScale(h){ return Math.min(0.5, 700/h); }
 let SCALE = fitScale(H);
@@ -198,25 +204,25 @@ function buildFrameVail(){
   canvas.add(frame);
 }
 
-/* Pureline — ferah/temiz: alt teal bar + sol üst hijyen rozeti */
+/* Pureline — sade/kurumsal: alt lacivert bar + sol üst yeşil hijyen rozeti (gerçek site paleti) */
 function buildFramePureline(){
   const els = [];
-  els.push(new fabric.Rect({ left:0, top:H-84, width:W, height:84, fill:'rgba(15,61,62,0.85)' }));
+  els.push(new fabric.Rect({ left:0, top:H-84, width:W, height:84, fill:'rgba(13,79,124,0.85)' })); // lacivert #0D4F7C
   els.push(new fabric.Text('pureline', { left:60, top:H-62, fontFamily:'Poppins', fontWeight:700, fontSize:38, fill:'#fff' }));
-  els.push(new fabric.Text('Profesyonel Temizlik', { left:W-360, top:H-54, fontFamily:'Poppins', fontWeight:500, fontSize:24, fill:'#9fe6da' }));
-  els.push(new fabric.Rect({ left:60, top:56, width:240, height:46, rx:23, ry:23, fill:'#3BD6C0' }));
-  els.push(new fabric.Text('✓ Hijyen Garantili', { left:84, top:67, fontFamily:'Poppins', fontWeight:600, fontSize:22, fill:'#0F3D3E' }));
+  els.push(new fabric.Text('Profesyonel Temizlik', { left:W-360, top:H-54, fontFamily:'Poppins', fontWeight:500, fontSize:24, fill:'#8FD3F0' })); // açık mavi
+  els.push(new fabric.Rect({ left:60, top:56, width:240, height:46, rx:23, ry:23, fill:'#3A8C3F' })); // yeşil
+  els.push(new fabric.Text('✓ Hijyen Garantili', { left:84, top:67, fontFamily:'Poppins', fontWeight:600, fontSize:22, fill:'#fff' }));
   frame = new fabric.Group(els, { selectable:false, evented:false }); canvas.add(frame);
 }
 
-/* Dethleffs Leal — premium: sol üst wordmark + alt koyu bar */
+/* Dethleffs Leal — gerçek marka rengi kurumsal kırmızı: sol üst wordmark + alt kırmızı bar */
 function buildFrameDethleffs(){
   const els = [];
   els.push(new fabric.Text('DETHLEFFS', { left:60, top:54, fontFamily:'Poppins', fontWeight:700, fontSize:42, charSpacing:120, fill:'#fff' }));
-  els.push(new fabric.Text('by Leal Karavan', { left:64, top:106, fontFamily:'Poppins', fontWeight:500, fontSize:22, fill:'#D9BE84' }));
-  els.push(new fabric.Rect({ left:0, top:H-78, width:W, height:78, fill:'rgba(14,42,71,0.80)' }));
+  els.push(new fabric.Text('by Leal Karavan', { left:64, top:106, fontFamily:'Poppins', fontWeight:500, fontSize:22, fill:'rgba(255,255,255,0.85)' }));
+  els.push(new fabric.Rect({ left:0, top:H-78, width:W, height:78, fill:'rgba(192,57,43,0.85)' })); // kurumsal kırmızı #C0392B
   els.push(new fabric.Text('lealkaravan.com', { left:60, top:H-55, fontFamily:'Poppins', fontWeight:500, fontSize:24, fill:'#fff' }));
-  els.push(new fabric.Text('Almanya kalitesi', { left:W-300, top:H-55, fontFamily:'Poppins', fontWeight:500, fontSize:24, fill:'#D9BE84' }));
+  els.push(new fabric.Text('Ailenizin Dostu', { left:W-300, top:H-55, fontFamily:'Poppins', fontWeight:500, fontSize:24, fill:'#fff' }));
   frame = new fabric.Group(els, { selectable:false, evented:false }); canvas.add(frame);
 }
 
@@ -268,6 +274,13 @@ function restack(){
   if(overlay) overlay.bringToFront();
   if(frame) frame.bringToFront();
   [tagsBox, headlineBox, emphasisBox].forEach(o=>o && o.bringToFront());
+  applyTextOverlayVisibility();
+}
+
+/* metin-üstü-görsel aç/kapa — kapalıyken temiz foto + sadece marka filigranı kalır */
+function applyTextOverlayVisibility(){
+  [headlineBox, emphasisBox, tagsBox, overlay].forEach(o=>o && o.set('visible', textOverlayOn));
+  canvas.requestRenderAll();
 }
 
 /* ---------- format değiştir (metin+foto korunur) ---------- */
@@ -343,7 +356,7 @@ async function savePost(durum){
       body: JSON.stringify({
         id: (window.ESTO.post && window.ESTO.post.id) || null,
         catalog_item_id: id,
-        gorsel_yazilari: { headline: headlineBox.text, emphasis: emphasisBox.text, tags: tagsBox.text, format: currentFormat },
+        gorsel_yazilari: { headline: headlineBox.text, emphasis: emphasisBox.text, tags: tagsBox.text, format: currentFormat, text_overlay: textOverlayOn },
         caption: document.getElementById('fCaption').value,
         durum: durum,
         image: image
@@ -376,9 +389,14 @@ async function savePost(durum){
     if(g.headline!=null) headlineBox.set('text', g.headline);
     if(g.emphasis!=null) emphasisBox.set('text', g.emphasis);
     if(g.tags!=null) tagsBox.set('text', g.tags);
+    if(g.text_overlay!=null) textOverlayOn = !!g.text_overlay;
     document.getElementById('fCaption').value = window.ESTO.post.caption || '';
     syncInputsFromCanvas(); canvas.requestRenderAll();
   }
+  document.getElementById('fTextOverlay').checked = textOverlayOn;
+  document.getElementById('fTextOverlay').addEventListener('change', function(){
+    textOverlayOn = this.checked; applyTextOverlayVisibility();
+  });
   restack();
 
   document.getElementById('genBtn').addEventListener('click', generate);

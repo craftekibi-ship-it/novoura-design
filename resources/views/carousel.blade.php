@@ -70,6 +70,11 @@
 
     <div class="divider"></div>
 
+    <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+      <input type="checkbox" id="fTextOverlay" style="width:auto"> Görsel üstünde yazı göster
+    </label>
+    <p class="mini">Kapalıysa fotoğraf temiz kalır, sadece marka filigranı görünür — metin yine de caption'a gider.</p>
+
     <label>Aktif slayt — Başlık (beyaz)</label>
     <input type="text" id="fHeadline">
     <label>Vurgu (amber)</label>
@@ -122,6 +127,7 @@ canvas.setZoom(SCALE);
 let photoObj=null, overlay=null, frame=null, headlineBox, emphasisBox, tagsBox;
 let slides = [];   // {cid, headline, emphasis, tags, photoSrc, thumb}
 let active = -1;
+let textOverlayOn = T.text_overlay !== false;
 
 function buildFrame(){
   if(T.frame === 'serm-barr') return buildFrameSermBarr();
@@ -165,20 +171,20 @@ function buildFrameVail(){
 }
 function buildFramePureline(){
   const els = [];
-  els.push(new fabric.Rect({ left:0, top:H-84, width:W, height:84, fill:'rgba(15,61,62,0.85)' }));
+  els.push(new fabric.Rect({ left:0, top:H-84, width:W, height:84, fill:'rgba(13,79,124,0.85)' })); // lacivert #0D4F7C
   els.push(new fabric.Text('pureline', { left:60, top:H-62, fontFamily:'Poppins', fontWeight:700, fontSize:38, fill:'#fff' }));
-  els.push(new fabric.Text('Profesyonel Temizlik', { left:W-360, top:H-54, fontFamily:'Poppins', fontWeight:500, fontSize:24, fill:'#9fe6da' }));
-  els.push(new fabric.Rect({ left:60, top:56, width:240, height:46, rx:23, ry:23, fill:'#3BD6C0' }));
-  els.push(new fabric.Text('✓ Hijyen Garantili', { left:84, top:67, fontFamily:'Poppins', fontWeight:600, fontSize:22, fill:'#0F3D3E' }));
+  els.push(new fabric.Text('Profesyonel Temizlik', { left:W-360, top:H-54, fontFamily:'Poppins', fontWeight:500, fontSize:24, fill:'#8FD3F0' })); // açık mavi
+  els.push(new fabric.Rect({ left:60, top:56, width:240, height:46, rx:23, ry:23, fill:'#3A8C3F' })); // yeşil
+  els.push(new fabric.Text('✓ Hijyen Garantili', { left:84, top:67, fontFamily:'Poppins', fontWeight:600, fontSize:22, fill:'#fff' }));
   frame = new fabric.Group(els, { selectable:false, evented:false }); canvas.add(frame);
 }
 function buildFrameDethleffs(){
   const els = [];
   els.push(new fabric.Text('DETHLEFFS', { left:60, top:54, fontFamily:'Poppins', fontWeight:700, fontSize:42, charSpacing:120, fill:'#fff' }));
-  els.push(new fabric.Text('by Leal Karavan', { left:64, top:106, fontFamily:'Poppins', fontWeight:500, fontSize:22, fill:'#D9BE84' }));
-  els.push(new fabric.Rect({ left:0, top:H-78, width:W, height:78, fill:'rgba(14,42,71,0.80)' }));
+  els.push(new fabric.Text('by Leal Karavan', { left:64, top:106, fontFamily:'Poppins', fontWeight:500, fontSize:22, fill:'rgba(255,255,255,0.85)' }));
+  els.push(new fabric.Rect({ left:0, top:H-78, width:W, height:78, fill:'rgba(192,57,43,0.85)' })); // kurumsal kırmızı #C0392B
   els.push(new fabric.Text('lealkaravan.com', { left:60, top:H-55, fontFamily:'Poppins', fontWeight:500, fontSize:24, fill:'#fff' }));
-  els.push(new fabric.Text('Almanya kalitesi', { left:W-300, top:H-55, fontFamily:'Poppins', fontWeight:500, fontSize:24, fill:'#D9BE84' }));
+  els.push(new fabric.Text('Ailenizin Dostu', { left:W-300, top:H-55, fontFamily:'Poppins', fontWeight:500, fontSize:24, fill:'#fff' }));
   frame = new fabric.Group(els, { selectable:false, evented:false }); canvas.add(frame);
 }
 function buildFrameNovoura(){
@@ -216,6 +222,13 @@ function restack(){
   if(overlay) overlay.bringToFront();
   if(frame) frame.bringToFront();
   [tagsBox,headlineBox,emphasisBox].forEach(o=>o&&o.bringToFront());
+  applyTextOverlayVisibility();
+}
+
+/* metin-üstü-görsel aç/kapa — kapalıyken temiz foto + sadece marka filigranı kalır (tüm slaytlar için ortak) */
+function applyTextOverlayVisibility(){
+  [headlineBox, emphasisBox, tagsBox, overlay].forEach(o=>o && o.set('visible', textOverlayOn));
+  canvas.requestRenderAll();
 }
 
 /* ---------- slayt durumu ---------- */
@@ -318,7 +331,7 @@ async function savePost(durum){
       method:'POST', headers:{'X-CSRF-TOKEN':window.CFG.csrf,'Content-Type':'application/json','Accept':'application/json'},
       body: JSON.stringify({
         catalog_item_id: slides[0].cid || null,
-        gorsel_yazilari: { headline:slides[0].headline, emphasis:slides[0].emphasis, tags:slides[0].tags, format:'carousel', slideCount:slides.length, slides:slides.map(s=>({headline:s.headline,emphasis:s.emphasis,tags:s.tags})) },
+        gorsel_yazilari: { headline:slides[0].headline, emphasis:slides[0].emphasis, tags:slides[0].tags, format:'carousel', slideCount:slides.length, text_overlay: textOverlayOn, slides:slides.map(s=>({headline:s.headline,emphasis:s.emphasis,tags:s.tags})) },
         caption: document.getElementById('fCaption').value, durum, image: cover
       })
     });
@@ -334,6 +347,10 @@ async function savePost(durum){
 
   buildText(); buildOverlay(); buildFrame();
   bindInputs();
+  document.getElementById('fTextOverlay').checked = textOverlayOn;
+  document.getElementById('fTextOverlay').addEventListener('change', function(){
+    textOverlayOn = this.checked; applyTextOverlayVisibility();
+  });
   // başlangıç: tek boş slayt
   slides=[{headline:'Slide 1',emphasis:'',tags:'',photoSrc:window.CFG.demoPhoto}]; active=0;
   loadActive().then(renderStrip);
