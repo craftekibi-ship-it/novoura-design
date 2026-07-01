@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Brand;
+use Illuminate\Http\Request;
 
 class BrandController extends Controller
 {
@@ -18,13 +19,17 @@ class BrandController extends Controller
         ]);
     }
 
-    /** Aktif markayı değiştir. */
-    public function switch(string $slug)
+    /** Aktif markayı değiştir. Pano'dan "Aç" ile gelindiyse Stüdyo'ya git, nav dropdown'dan gelindiyse bulunulan sayfada kal. */
+    public function switch(Request $request, string $slug)
     {
         if (Brand::where('slug', $slug)->exists()) {
             session(['brand_slug' => $slug]);
         }
 
-        return redirect('/studio');
+        if ($request->query('open') === 'studio') {
+            return redirect('/studio');
+        }
+
+        return redirect()->back(fallback: '/pano');
     }
 }

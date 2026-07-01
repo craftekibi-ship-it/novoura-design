@@ -36,7 +36,7 @@
         <div class="meta">{{ $tipLabel[$b->tip] ?? $b->tip }} · {{ $b->catalog_items_count }} ürün · {{ $b->posts_count }} post</div>
         <div class="st {{ $hazir?'ok':'no' }}">{{ $hazir ? '✓ Şablon hazır' : '○ Şablon bekliyor' }}</div>
         <div class="acts">
-          <a class="btn btn-amber" href="/marka/{{ $b->slug }}">Aç →</a>
+          <a class="btn btn-amber" href="/marka/{{ $b->slug }}?open=studio">Aç →</a>
           @if($b->slug===$current)<span class="cur">aktif</span>@endif
         </div>
       </div>
