@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AssetController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\PlanController;
@@ -18,6 +19,10 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 Route::middleware('auth')->group(function () {
     Route::get('/pano', [BrandController::class, 'pano'])->name('pano');
     Route::get('/marka/{slug}', [BrandController::class, 'switch'])->name('marka.switch');
+
+    Route::get('/gorseller', [AssetController::class, 'index'])->name('gorseller');
+    Route::post('/gorseller', [AssetController::class, 'store'])->name('gorseller.store');
+    Route::delete('/gorseller/{asset}', [AssetController::class, 'destroy'])->name('gorseller.destroy');
 
     Route::get('/toplu', [StudioController::class, 'batch'])->name('toplu');
     Route::get('/carousel', [StudioController::class, 'carousel'])->name('carousel');

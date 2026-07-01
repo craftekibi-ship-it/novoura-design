@@ -44,6 +44,7 @@
     @endisset
     <nav>
       <a href="/pano" class="@yield('n_pano')">Pano</a>
+      <a href="/gorseller" class="@yield('n_gorseller')">Görseller</a>
       <a href="/studio" class="@yield('n_studio')">Stüdyo</a>
       <a href="/toplu" class="@yield('n_toplu')">Toplu</a>
       <a href="/carousel" class="@yield('n_carousel')">Carousel</a>
